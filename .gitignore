@@ -1,0 +1,9 @@
+# File di valori reali dell'ambiente - NON committare
+*.local.ps1
+parameters.*.json
+*.secret
+.env
+
+# Artefatti vari
+*.log
+.DS_Store
