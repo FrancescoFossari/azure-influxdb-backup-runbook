@@ -23,10 +23,10 @@ writing to InfluxDB. Stopping InfluxDB without first pausing the feeder would ju
 up errors upstream. So the two have to be sequenced.
 
 This runbook automates that sequence end to end, on a schedule, with no human in the
-loop — and, crucially, **guarantees the environment comes back up even when the backup
+loop , and, crucially, **guarantees the environment comes back up even when the backup
 fails**.
 
----
+-
 
 ## What it does
 
@@ -39,11 +39,11 @@ fails**.
 ```
 
 Steps **4 and 5 run inside a `finally` block**. Whatever goes wrong in the backup,
-InfluxDB and the feeder are brought back up before the runbook exits — the system is
+InfluxDB and the feeder are brought back up before the runbook exits , the system is
 never left in a degraded state. If a restart itself fails, the log prints the exact
 manual recovery command.
 
----
+-
 
 ## Architecture
 
@@ -70,12 +70,12 @@ manual recovery command.
 No agent is installed on the VM or the cluster: everything is driven through Azure
 **Run Command**, authenticated as the Automation Account's managed identity.
 
----
+-
 
 ## Authentication & permissions
 
 The runbook signs in with the Automation Account's **system-assigned managed
-identity** (`Connect-AzAccount -Identity`) — **no secrets, keys, or tokens in code**.
+identity** (`Connect-AzAccount -Identity`) , **no secrets, keys, or tokens in code**.
 
 The identity needs these roles, each scoped as tightly as possible:
 
@@ -123,7 +123,7 @@ These are the non-obvious things, written down so they aren't rediscovered the h
 
 - **Run Command hides failures.** Both `Invoke-AzAksRunCommand` and VM Run Command
   report success at the Azure control-plane layer even when the command *inside* the
-  target fails. The wrappers inspect the real exit code / output and throw on failure —
+  target fails. The wrappers inspect the real exit code / output and throw on failure ,
   otherwise a silently failed "stop feeder" would let the backup run against a live
   database, defeating the whole point.
 
@@ -137,7 +137,7 @@ These are the non-obvious things, written down so they aren't rediscovered the h
 - **InfluxDB has a slow warm-up.** After a clean stop, InfluxDB rebuilds its in-memory
   cache on start and can stay in systemd state `activating` for **several minutes** on a
   large dataset. The start step polls for up to **15 minutes** before giving up, so the
-  feeder is only resumed once the database is truly serving — not the moment the start
+  feeder is only resumed once the database is truly serving , not the moment the start
   command returns.
 
 - **Azure VM backups are incremental.** The first recovery point is a full; every
